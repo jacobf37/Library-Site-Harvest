@@ -28,11 +28,19 @@ namespace Landis.Library.SiteHarvest
             // of this library.
             if (! libInitialized)
             {
-                Model.Core = modelCore;
-                SiteVars.Initialize();
-                AgeRangeParsing.InitializeClass();
-                libInitialized = true;
+                ResetLib(modelCore);
             }
+        }
+
+        // For InitilizePhase2() and CleanUp(), there may be cases in which the 
+        // model core gets reset and everything needs to be reinitilized. Thus this 
+        // should only be called in those 2 functions if necessary.
+        public static void ResetLib(ICore modelCore)
+        {
+            Model.Core = modelCore;
+            SiteVars.Initialize();
+            AgeRangeParsing.InitializeClass();
+            libInitialized = true;
         }
     }
 }
