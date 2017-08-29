@@ -1,4 +1,4 @@
-using Edu.Wisc.Forest.Flel.Util; 
+using Edu.Wisc.Forest.Flel.Util;
 using Landis.Core;
 using Landis.Library.Succession;
 using System.Collections.Generic;
@@ -16,6 +16,7 @@ namespace Landis.Library.SiteHarvest
         private ISpeciesDataset speciesDataset;
         private InputVar<string> speciesName;
         private MultiSpeciesCohortSelector cohortSelector;
+        private MultiSpeciesCohortSelector additionalCohortSelector;
 
         /// <summary>
         /// Line number where each species was found.  Used to check for
@@ -35,7 +36,7 @@ namespace Landis.Library.SiteHarvest
         /// Are keywords like "Oldest" and "AllExceptYoungest" accepted?
         /// </param>
         public BasicParameterParser(ISpeciesDataset speciesDataset,
-                                    bool            keywordsEnabled)
+                                    bool keywordsEnabled)
         {
             this.keywordsEnabled = keywordsEnabled;
             this.speciesDataset = speciesDataset;
@@ -95,7 +96,7 @@ namespace Landis.Library.SiteHarvest
                                               speciesName.Value.String);
             return species;
         }
-        
+
         //---------------------------------------------------------------------
 
         /// <summary>
@@ -109,10 +110,20 @@ namespace Landis.Library.SiteHarvest
             else
                 namesThatFollow = new List<string>(names);
 
-            cohortSelector = new MultiSpeciesCohortSelector();
             SpeciesLineNumbers.Clear();
 
-            while (! AtEndOfInput && ! namesThatFollow.Contains(CurrentName)) {
+            //if we are reading a single repeat
+            if (names.Length == 3)
+            {
+                additionalCohortSelector = new MultiSpeciesCohortSelector();
+            }
+            else
+            {
+                cohortSelector = new MultiSpeciesCohortSelector();
+            }
+
+            while (!AtEndOfInput && !namesThatFollow.Contains(CurrentName))
+            {
                 StringReader currentLine = new StringReader(CurrentLine);
 
                 // Species name
@@ -130,50 +141,108 @@ namespace Landis.Library.SiteHarvest
                 bool foundKeyword = false;
                 if (keywordsEnabled)
                 {
-                    if (word == "All") {
-                        cohortSelector[species] = SelectCohorts.All;
+                    if (word == "All")
+                    {
+                        if (names.Length == 3)
+                        {
+                            additionalCohortSelector[species] = SelectCohorts.All;
+                        }
+                        else
+                        {
+                            cohortSelector[species] = SelectCohorts.All;
+                        }
                         foundKeyword = true;
                     }
-                    else if (word == "Youngest") {
-                        cohortSelector[species] = SelectCohorts.Youngest;
+                    else if (word == "Youngest")
+                    {
+                        if (names.Length == 3)
+                        {
+                            additionalCohortSelector[species] = SelectCohorts.Youngest;
+                        }
+                        else
+                        {
+                            cohortSelector[species] = SelectCohorts.Youngest;
+                        }
                         foundKeyword = true;
                     }
-                    else if (word == "AllExceptYoungest") {
-                        cohortSelector[species] = SelectCohorts.AllExceptYoungest;
+                    else if (word == "AllExceptYoungest")
+                    {
+                        if (names.Length == 3)
+                        {
+                            additionalCohortSelector[species] = SelectCohorts.AllExceptYoungest;
+                        }
+                        else
+                        {
+                            cohortSelector[species] = SelectCohorts.AllExceptYoungest;
+                        }
                         foundKeyword = true;
                     }
-                    else if (word == "Oldest") {
-                        cohortSelector[species] = SelectCohorts.Oldest;
+                    else if (word == "Oldest")
+                    {
+                        if (names.Length == 3)
+                        {
+                            additionalCohortSelector[species] = SelectCohorts.Oldest;
+                        }
+                        else
+                        {
+                            cohortSelector[species] = SelectCohorts.Oldest;
+                        }
                         foundKeyword = true;
                     }
-                    else if (word == "AllExceptOldest") {
-                        cohortSelector[species] = SelectCohorts.AllExceptOldest;
+                    else if (word == "AllExceptOldest")
+                    {
+                        if (names.Length == 3)
+                        {
+                            additionalCohortSelector[species] = SelectCohorts.AllExceptOldest;
+                        }
+                        else
+                        {
+                            cohortSelector[species] = SelectCohorts.AllExceptOldest;
+                        }
                         foundKeyword = true;
                     }
-                    else if (word.StartsWith("1/")) {
+                    else if (word.StartsWith("1/"))
+                    {
                         InputVar<ushort> N = new InputVar<ushort>("1/N");
                         N.ReadValue(new StringReader(word.Substring(2)));
                         if (N.Value.Actual == 0)
                             throw NewParseException("For \"1/N\", N must be > 0");
-                        cohortSelector[species] = new EveryNthCohort(N.Value.Actual).SelectCohorts;
+
+                        if (names.Length == 3)
+                        {
+                            additionalCohortSelector[species] = new EveryNthCohort(N.Value.Actual).SelectCohorts;
+                        }
+                        else
+                        {
+                            cohortSelector[species] = new EveryNthCohort(N.Value.Actual).SelectCohorts;
+                        }
                         foundKeyword = true;
                     }
                 }
 
                 if (foundKeyword)
                     CheckNoDataAfter("the keyword \"" + word + "\"", currentLine);
-                else {
+                else
+                {
                     //  Read one or more ages or age ranges
                     List<ushort> ages = new List<ushort>();
                     List<AgeRange> ranges = new List<AgeRange>();
                     currentLine = new StringReader(CurrentLine.Substring(indexOfDataAfterSpecies));
                     InputVar<AgeRange> ageOrRange = new InputVar<AgeRange>("Age or Age Range");
-                    while (currentLine.Peek() != -1) {
+                    while (currentLine.Peek() != -1)
+                    {
                         ReadValue(ageOrRange, currentLine);
                         ValidateAgeOrRange(ageOrRange.Value, ages, ranges);
                         TextReader.SkipWhitespace(currentLine);
                     }
-                    CreateCohortSelectionMethodFor(species, ages, ranges);
+                    if (names.Length == 3)
+                    {
+                        CreateAdditionalCohortSelectionMethodFor(species, ages, ranges);
+                    }
+                    else
+                    {
+                        CreateCohortSelectionMethodFor(species, ages, ranges);
+                    }
                 }
 
                 GetNextLine();
@@ -182,7 +251,14 @@ namespace Landis.Library.SiteHarvest
             if (SpeciesLineNumbers.Count == 0)
                 throw NewParseException("Expected a line starting with a species name");
 
-            return cohortSelector;
+            if (names.Length == 3)
+            {
+                return additionalCohortSelector;
+            }
+            else
+            {
+                return cohortSelector;
+            }
         }
 
         //---------------------------------------------------------------------
@@ -201,6 +277,22 @@ namespace Landis.Library.SiteHarvest
                                                               IList<AgeRange> ranges)
         {
             cohortSelector[species] = new SpecificAgesCohortSelector(ages, ranges).SelectCohorts;
+        }
+
+        /// <summary>
+        /// Creates and stores the cohort selection method for a particular
+        /// species based on lists of specific ages and age ranges for single repeat.
+        /// </summary>
+        /// <remarks>
+        /// Derived classes can override this method to perform special
+        /// handling of ages and ranges (for example, percentages for partial
+        /// harvesting in biomass extensions).
+        /// </remarks>
+        protected virtual void CreateAdditionalCohortSelectionMethodFor(ISpecies species,
+                                                              IList<ushort> ages,
+                                                              IList<AgeRange> ranges)
+        {
+            additionalCohortSelector[species] = new SpecificAgesCohortSelector(ages, ranges).SelectCohorts;
         }
 
         //---------------------------------------------------------------------
@@ -223,14 +315,16 @@ namespace Landis.Library.SiteHarvest
         /// list.
         /// </remarks>
         protected void ValidateAgeOrRange(InputValue<AgeRange> ageOrRange,
-                                          List<ushort>         ages,
-                                          List<AgeRange>       ranges)
+                                          List<ushort> ages,
+                                          List<AgeRange> ranges)
         {
-            if (ageOrRange.String.Contains("-")) {
+            if (ageOrRange.String.Contains("-"))
+            {
                 AgeRange range = ageOrRange.Actual;
 
                 //  Does the range contain any individual ages?
-                foreach (ushort age in ages) {
+                foreach (ushort age in ages)
+                {
                     if (range.Contains(age))
                         throw new InputValueException(ageOrRange.String,
                                                       "The range {0} contains the age {1}",
@@ -238,7 +332,8 @@ namespace Landis.Library.SiteHarvest
                 }
 
                 //  Does the range overlap any previous ranges?
-                foreach (AgeRange previousRange in ranges) {
+                foreach (AgeRange previousRange in ranges)
+                {
                     if (range.Overlaps(previousRange))
                         throw new InputValueException(ageOrRange.String,
                                                       "The range {0} overlaps the range {1}-{2}",
@@ -247,11 +342,13 @@ namespace Landis.Library.SiteHarvest
 
                 ranges.Add(range);
             }
-            else {
+            else
+            {
                 ushort age = ageOrRange.Actual.Start;
 
                 //  Does the age match any of the previous ages?
-                foreach (ushort previousAge in ages) {
+                foreach (ushort previousAge in ages)
+                {
                     if (age == previousAge)
                         throw new InputValueException(ageOrRange.String,
                                                       "The age {0} appears more than once",
@@ -259,7 +356,8 @@ namespace Landis.Library.SiteHarvest
                 }
 
                 //  Is the age in any of the previous ranges?
-                foreach (AgeRange previousRange in ranges) {
+                foreach (AgeRange previousRange in ranges)
+                {
                     if (previousRange.Contains(age))
                         throw new InputValueException(ageOrRange.String,
                                                       "The age {0} lies within the range {1}-{2}",
@@ -291,14 +389,15 @@ namespace Landis.Library.SiteHarvest
         /// Reads a list of species names from the current input line.
         /// </summary>
         public InputValue<List<ISpecies>> ReadSpeciesList(StringReader currentLine,
-                                                          out int      index)
+                                                          out int index)
         {
             List<string> speciesNames = new List<string>();
             List<ISpecies> speciesList = new List<ISpecies>();
 
             TextReader.SkipWhitespace(currentLine);
             index = currentLine.Index;
-            while (currentLine.Peek() != -1) {
+            while (currentLine.Peek() != -1)
+            {
                 ISpecies species = ReadAndValidateSpeciesName(currentLine);
                 if (speciesNames.Contains(species.Name))
                     throw new InputValueException(speciesName.Value.String,
