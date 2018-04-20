@@ -1,6 +1,6 @@
 // Copyright 2005 University of Wisconsin
 
-using Edu.Wisc.Forest.Flel.Util;
+using Landis.Utilities;
 
 using FormatException = System.FormatException;
 
