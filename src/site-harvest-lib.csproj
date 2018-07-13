@@ -2,36 +2,45 @@
 
   <PropertyGroup>
     <RootNamespace>Landis.Library.SiteHarvest</RootNamespace>
-    <AssemblyName>Landis.Library.SiteHarvest-v1</AssemblyName>
-    <AssemblyTitle>Harvest Library</AssemblyTitle>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <AssemblyName>Landis.Library.SiteHarvest-v2</AssemblyName>
+    <AssemblyTitle>Landis.Library.SiteHarvest-v2</AssemblyTitle>
+    <AssemblyCompany>LANDIS-II Foundation</AssemblyCompany>
+    <AssemblyProduct>Landis.Library.SiteHarvest-v2</AssemblyProduct>
+    <AssemblyCopyright>Landis-II-Foundation</AssemblyCopyright>        
+    <AssemblyVersion>2.0</AssemblyVersion>
     <AssemblyDescription>Harvest Library for LANDIS-II</AssemblyDescription>
     <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
-  
-  <PropertyGroup>
-    <StartupObject />
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Product>Harvest Library</Product>
-    <Description>Harvest Library for LANDIS-II</Description>
-    <PackageLicenseUrl>https://github.com/LANDIS-II-Foundation/Library-Site-Harvest/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://sites.google.com/site/landismodel/home</PackageProjectUrl>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <RepositoryUrl>https://github.com/LANDIS-II-Foundation/Library-Site-Harvest</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>LANDIS-II;Landis;Library;Site Harvest</PackageTags>
+    <PackageLicenseUrl>https://github.com/LANDIS-II-Foundation/Library-Site-Harvest/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>http://www.landis-ii.org</PackageProjectUrl>
     <NeutralLanguage>English</NeutralLanguage>
+    <Authors>Landis-II-Foundation</Authors>
+    <Product>Harvest Library</Product>
+    <Copyright>Landis-II-Foundation</Copyright> 
+    <Version>2.0</Version> 
+    <PackageTags>LANDIS-II;Landis;Library;Site Harvest</PackageTags>
+    <Description>Harvest Library for LANDIS-II</Description>
+    <PackageReleaseNotes>.NET Standard 2.0 update.</PackageReleaseNotes>
+    <FileVersion>7.0</FileVersion>
   </PropertyGroup>
   
   <ItemGroup>    
-    <PackageReference Include="Landis.Core" Version="1.0.0" />    
-    <PackageReference Include="Landis.Library.AgeOnlyCohorts" Version="1.0.0" />    
-    <PackageReference Include="Landis.Library.Cohorts" Version="1.0.0" />    
-    <PackageReference Include="Landis.Library.Succession" Version="1.0.0" />    
-    <PackageReference Include="Landis.SpatialModeling" Version="1.0.0" />    
-    <PackageReference Include="Landis.Utilities" Version="1.0.0" />    
-    <PackageReference Include="log4net" Version="2.0.8" />
-
+    <PackageReference Include="Landis.Core" Version="2.0.0" />
     <!-- Use Succession-vAGB for NECN-Hydro scenario -->
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Reference Include="Landis.Library.AgeOnlyCohorts-v3">
+      <HintPath>lib\Landis.Library.AgeOnlyCohorts-v3.dll</HintPath>
+    </Reference>
+    <Reference Include="Landis.Library.Cohorts-v2">
+      <HintPath>lib\Landis.Library.Cohorts-v2.dll</HintPath>
+    </Reference>
+    <Reference Include="Landis.Library.Succession-v6">
+      <HintPath>lib\Landis.Library.Succession-v6.dll</HintPath>
+    </Reference>
   </ItemGroup>
   
 </Project>
