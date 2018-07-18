@@ -1,109 +1,46 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DB1A8F76-7AFC-46BC-B3F7-ADE33601D4F6}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Landis.Library.SiteHarvest</RootNamespace>
-    <AssemblyName>Landis.Library.SiteHarvest-v1</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Landis.Library.SiteHarvest-v1.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Landis.Library.SiteHarvest-v1.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="BasicParameterParser.cs" />
-    <Compile Include="CohortCounts.cs" />
-    <Compile Include="cohort-selection\AgeRange.cs" />
-    <Compile Include="cohort-selection\AgeRangeParsing.cs" />
-    <Compile Include="cohort-selection\AgesAndRanges.cs" />
-    <Compile Include="cohort-selection\Clearcut.cs" />
-    <Compile Include="cohort-selection\EveryNthCohort.cs" />
-    <Compile Include="cohort-selection\ICohortSelector.cs" />
-    <Compile Include="cohort-selection\MultiSpeciesCohortSelector.cs" />
-    <Compile Include="cohort-selection\SelectCohorts.cs" />
-    <Compile Include="cohort-selection\SpecificAgesCohortSelector.cs" />
-    <Compile Include="ICohortCutter.cs" />
-    <Compile Include="Main.cs" />
-    <Compile Include="Model.cs" />
-    <Compile Include="ParameterNames.cs" />
-    <Compile Include="SiteVars.cs" />
-    <Compile Include="WholeCohortCutter.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Edu.Wisc.Forest.Flel.Util">    
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private> 
-    </Reference>
-    <Reference Include="Landis.Core">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Landis.Library.AgeOnlyCohorts">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Landis.Library.Cohorts">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Landis.Library.Succession-v5">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Landis.SpatialModeling">
-      <SpecificVersion>False</SpecificVersion>
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="log4net">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <PreBuildEvent>call $(SolutionDir)\install-libs.cmd</PreBuildEvent>
-</PropertyGroup>
-<!--
-   To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+    <RootNamespace>Landis.Library.SiteHarvest</RootNamespace>
+    <AssemblyName>Landis.Library.SiteHarvest-v2</AssemblyName>
+    <AssemblyTitle>Landis.Library.SiteHarvest-v2</AssemblyTitle>
+    <AssemblyCompany>LANDIS-II Foundation</AssemblyCompany>
+    <AssemblyProduct>Landis.Library.SiteHarvest-v2</AssemblyProduct>
+    <AssemblyCopyright>Landis-II-Foundation</AssemblyCopyright>        
+    <AssemblyVersion>2.0</AssemblyVersion>
+    <AssemblyDescription>Harvest Library for LANDIS-II</AssemblyDescription>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <RepositoryUrl>https://github.com/LANDIS-II-Foundation/Library-Site-Harvest</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseUrl>https://github.com/LANDIS-II-Foundation/Library-Site-Harvest/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>http://www.landis-ii.org</PackageProjectUrl>
+    <NeutralLanguage>English</NeutralLanguage>
+    <Authors>Landis-II-Foundation</Authors>
+    <Product>Harvest Library</Product>
+    <Copyright>Landis-II-Foundation</Copyright> 
+    <Version>2.0</Version> 
+    <PackageTags>LANDIS-II;Landis;Library;Site Harvest</PackageTags>
+    <Description>Harvest Library for LANDIS-II</Description>
+    <PackageReleaseNotes>.NET Standard 2.0 update.</PackageReleaseNotes>
+    <FileVersion>7.0</FileVersion>
+  </PropertyGroup>
+  
+  <ItemGroup>    
+    <PackageReference Include="Landis.Core" Version="2.0.0" />
+    <!-- Use Succession-vAGB for NECN-Hydro scenario -->
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Reference Include="Landis.Library.AgeOnlyCohorts-v3">
+      <HintPath>lib\Landis.Library.AgeOnlyCohorts-v3.dll</HintPath>
+    </Reference>
+    <Reference Include="Landis.Library.Cohorts-v2">
+      <HintPath>lib\Landis.Library.Cohorts-v2.dll</HintPath>
+    </Reference>
+    <Reference Include="Landis.Library.Succession-v6">
+      <HintPath>lib\Landis.Library.Succession-v6.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  
 </Project>
