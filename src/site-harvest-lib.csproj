@@ -7,7 +7,7 @@
     <AssemblyCompany>LANDIS-II Foundation</AssemblyCompany>
     <AssemblyProduct>Landis.Library.SiteHarvest-v2</AssemblyProduct>
     <AssemblyCopyright>Landis-II-Foundation</AssemblyCopyright>        
-    <AssemblyVersion>2.0</AssemblyVersion>
+    <AssemblyVersion>2.1</AssemblyVersion>
     <AssemblyDescription>Harvest Library for LANDIS-II</AssemblyDescription>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -19,11 +19,11 @@
     <Authors>Landis-II-Foundation</Authors>
     <Product>Harvest Library</Product>
     <Copyright>Landis-II-Foundation</Copyright> 
-    <Version>2.0</Version> 
+    <Version>2.1</Version> 
     <PackageTags>LANDIS-II;Landis;Library;Site Harvest</PackageTags>
     <Description>Harvest Library for LANDIS-II</Description>
     <PackageReleaseNotes>.NET Standard 2.0 update.</PackageReleaseNotes>
-    <FileVersion>7.0</FileVersion>
+    <FileVersion>2.1</FileVersion>
   </PropertyGroup>
   
   <ItemGroup>    
