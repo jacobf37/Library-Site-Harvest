@@ -2,6 +2,8 @@ using Landis.Utilities;
 using Landis.Core;
 using Landis.Library.Succession;
 using System.Collections.Generic;
+using System.Text;
+using System;
 
 namespace Landis.Library.SiteHarvest
 {
@@ -17,6 +19,8 @@ namespace Landis.Library.SiteHarvest
         private InputVar<string> speciesName;
         private MultiSpeciesCohortSelector cohortSelector;
         private MultiSpeciesCohortSelector additionalCohortSelector;
+
+        private Dictionary<ISpecies, uint> dummyDict;
 
         /// <summary>
         /// Line number where each species was found.  Used to check for
@@ -376,9 +380,21 @@ namespace Landis.Library.SiteHarvest
         /// </summary>
         protected Planting.SpeciesList ReadSpeciesToPlant()
         {
+            //InputVar<List<ISpecies>> plant = new InputVar<List<ISpecies>>(ParameterNames.Plant, ReadSpeciesList);
+            /*            InputVar<Dictionary<ISpecies, uint>> plant2 = new InputVar<Dictionary<ISpecies, uint>>(ParameterNames.Plant, ReadSpeciesDict);
+                        if (ReadOptionalVar(plant2))
+                        {
+
+                            List<ISpecies> keyList = new List<ISpecies>(plant2.Value.Actual.Keys);
+                            return new Planting.SpeciesList(keyList, speciesDataset, plant2.Value.Actual);
+
+                            //return new Planting.SpeciesList(plant2.Value.Actual, speciesDataset);
+                        }*/
             InputVar<List<ISpecies>> plant = new InputVar<List<ISpecies>>(ParameterNames.Plant, ReadSpeciesList);
             if (ReadOptionalVar(plant))
+            { 
                 return new Planting.SpeciesList(plant.Value.Actual, speciesDataset);
+            }
             else
                 return null;
         }
@@ -412,6 +428,211 @@ namespace Landis.Library.SiteHarvest
 
             return new InputValue<List<ISpecies>>(speciesList,
                                                   string.Join(" ", speciesNames.ToArray()));
+        }
+
+        public InputValue<Dictionary<ISpecies, uint>> ReadSpeciesDict(StringReader currentLine,
+                                                  out int index)
+        {
+            List<string> speciesNames = new List<string>();
+            List<ISpecies> speciesList = new List<ISpecies>();
+
+            TextReader.SkipWhitespace(currentLine);
+            index = currentLine.Index;
+            while (currentLine.Peek() != -1)
+            {
+                ISpecies species = ReadAndValidateSpeciesName(currentLine);
+                if (speciesNames.Contains(species.Name))
+                    throw new InputValueException(speciesName.Value.String,
+                                                  "The species {0} appears more than once.", species.Name);
+                speciesNames.Add(species.Name);
+                speciesList.Add(species);
+
+                TextReader.SkipWhitespace(currentLine);
+            }
+            if (speciesNames.Count == 0)
+                throw new InputValueException(); // Missing value
+
+            dummyDict = new Dictionary<ISpecies, uint>
+                {
+                    { speciesList[0], 400 },
+                    { speciesList[1], 500 }
+                };
+
+            return new InputValue<Dictionary<ISpecies, uint>>(dummyDict,
+                                                  string.Join(" ", speciesNames.ToArray()));
+        }
+
+
+
+        //---------------------------------------------------------------------
+        //---------------------------------------------------------------------
+
+        protected Planting.SpeciesList ReadDensitySpeciesToPlant()
+        {
+            //InputVar<List<ISpecies>> plant = new InputVar<List<ISpecies>>(ParameterNames.Plant, ReadSpeciesList);
+            InputVar<Dictionary<ISpecies, uint>> plant = new InputVar<Dictionary<ISpecies, uint>>(ParameterNames.Plant, ReadDensitySpeciesList);
+            if (ReadOptionalVar(plant))
+            {
+
+                List<ISpecies> keyList = new List<ISpecies>(plant.Value.Actual.Keys);
+                return new Planting.SpeciesList(keyList, speciesDataset, plant.Value.Actual);
+
+            }
+            else
+                return null;
+        }
+
+        //---------------------------------------------------------------------
+
+        /// <summary>
+        /// Reads a list of species names from the current input line.
+        /// </summary>
+        public InputValue<Dictionary<ISpecies, uint>> ReadDensitySpeciesList(StringReader currentLine,
+                                                          out int index)
+        {
+            List<string> speciesNames = new List<string>();
+            //List<ISpecies> speciesList = new List<ISpecies>();
+            uint plantDensity = 0;
+
+            Dictionary<ISpecies, uint> speciesPlanting = new Dictionary<ISpecies, uint>();
+            TextReader.SkipWhitespace(currentLine);
+            index = currentLine.Index;
+            while (currentLine.Peek() != -1)
+            {
+                ISpecies species = ReadAndValidateSpeciesName(currentLine);
+                if (speciesPlanting.ContainsKey(species))
+                    throw new InputValueException(speciesName.Value.String,
+                                                  "The species {0} appears more than once.", species.Name);
+
+                TextReader.SkipWhitespace(currentLine);
+
+                int nextChar = currentLine.Peek();
+                if (nextChar == '(')
+                {
+                    plantDensity = ReadPlantingDensity(currentLine);
+                    TextReader.SkipWhitespace(currentLine);
+                }
+
+                speciesNames.Add(species.Name);
+                speciesPlanting.Add(species, plantDensity);
+                //speciesList.Add(species);
+
+                TextReader.SkipWhitespace(currentLine);
+            }
+            if (speciesNames.Count == 0)
+                throw new InputValueException(); // Missing value
+
+            return new InputValue<Dictionary<ISpecies, uint>>(speciesPlanting, string.Join(" ", speciesNames.ToArray()));
+            //return new InputValue<List<ISpecies>>(speciesList,string.Join(" ", speciesNames.ToArray()));
+        }
+
+        //---------------------------------------------------------------------
+
+        public static InputValue<uint> ReadPlantingDensity(StringReader reader)
+        {
+            TextReader.SkipWhitespace(reader);
+            //index = reader.Index;
+
+            //  Read left parenthesis
+            int nextChar = reader.Peek();
+            if (nextChar == -1)
+                throw new InputValueException();  // Missing value
+            if (nextChar != '(')
+                throw MakeInputValueException(TextReader.ReadWord(reader),
+                                              "Value does not start with \"(\"");
+
+            StringBuilder valueAsStr = new StringBuilder();
+            valueAsStr.Append((char)(reader.Read()));
+
+            //  Read whitespace between '(' and percentage
+            valueAsStr.Append(ReadWhitespace(reader));
+
+            //  Read percentage
+            string word = ReadWord(reader, ')');
+            if (word == "")
+                throw MakeInputValueException(valueAsStr.ToString(),
+                                              "No biomass after \"(\"");
+            valueAsStr.Append(word);
+            uint planting;
+            try
+            {
+                planting = (uint)Int32.Parse(word); // Percentage.Parse(word);
+            }
+            catch (System.FormatException exc)
+            {
+                throw MakeInputValueException(valueAsStr.ToString(),
+                                              exc.Message);
+            }
+            if (planting < 0.0 || planting > 100000)
+                throw MakeInputValueException(valueAsStr.ToString(),
+                                              string.Format("{0} is not between 0% and 100%", word));
+
+            //  Read whitespace and ')'
+            valueAsStr.Append(ReadWhitespace(reader));
+            char? ch = TextReader.ReadChar(reader);
+            if (!ch.HasValue)
+                throw MakeInputValueException(valueAsStr.ToString(),
+                                              "Missing \")\"");
+            valueAsStr.Append(ch.Value);
+            if (ch != ')')
+                throw MakeInputValueException(valueAsStr.ToString(),
+                                              string.Format("Value ends with \"{0}\" instead of \")\"", ch));
+
+            //Landis.Library.Succession.Model.Core.UI.WriteLine("Read in biomass value: {0}", biomass);
+
+            return new InputValue<uint>(planting, "Planting density");
+        }
+        //---------------------------------------------------------------------
+        //---------------------------------------------------------------------
+
+        /// <summary>
+        /// Creates a new InputValueException for an invalid percentage input
+        /// value.
+        /// </summary>
+        /// <returns></returns>
+        public static InputValueException MakeInputValueException(string value,
+                                                                  string message)
+        {
+            return new InputValueException(value,
+                                           string.Format("\"{0}\" is not a valid aboveground biomass input", value),
+                                           new MultiLineText(message));
+        }
+        //---------------------------------------------------------------------
+        //---------------------------------------------------------------------
+
+        /// <summary>
+        /// Reads whitespace from a string reader.
+        /// </summary>
+        public static string ReadWhitespace(StringReader reader)
+        {
+            StringBuilder whitespace = new StringBuilder();
+            int i = reader.Peek();
+            while (i != -1 && char.IsWhiteSpace((char)i))
+            {
+                whitespace.Append((char)reader.Read());
+                i = reader.Peek();
+            }
+            return whitespace.ToString();
+        }
+        //---------------------------------------------------------------------
+        /// <summary>
+        /// Reads a word from a string reader.
+        /// </summary>
+        /// <remarks>
+        /// The word is terminated by whitespace, the end of input, or a
+        /// particular delimiter character.
+        /// </remarks>
+        public static string ReadWord(StringReader reader,
+                                      char delimiter)
+        {
+            StringBuilder word = new StringBuilder();
+            int i = reader.Peek();
+            while (i != -1 && !char.IsWhiteSpace((char)i) && i != delimiter)
+            {
+                word.Append((char)reader.Read());
+                i = reader.Peek();
+            }
+            return word.ToString();
         }
     }
 }
