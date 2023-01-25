@@ -10,7 +10,7 @@ namespace Landis.Library.SiteHarvest
     /// harvest parameters -- cohort selectors and species planting list.
     /// </summary>
     public abstract class BasicParameterParser<T>
-        : Landis.TextParser<T>
+        : SuccessionParameterParser<T>
     {
         private bool keywordsEnabled;
         private ISpeciesDataset speciesDataset;
@@ -37,6 +37,7 @@ namespace Landis.Library.SiteHarvest
         /// </param>
         public BasicParameterParser(ISpeciesDataset speciesDataset,
                                     bool keywordsEnabled)
+            :base(speciesDataset, keywordsEnabled)
         {
             this.keywordsEnabled = keywordsEnabled;
             this.speciesDataset = speciesDataset;
@@ -80,7 +81,7 @@ namespace Landis.Library.SiteHarvest
 
         //---------------------------------------------------------------------
 
-        /// <summary>
+        /*/// <summary>
         /// Read a species name from the current input line.
         /// </summary>
         /// <exception cref="InputValueException">
@@ -96,7 +97,7 @@ namespace Landis.Library.SiteHarvest
                                               speciesName.Value.String);
             return species;
         }
-
+        */
         //---------------------------------------------------------------------
 
         /// <summary>
